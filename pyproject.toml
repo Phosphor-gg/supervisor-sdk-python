@@ -32,7 +32,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://supervisor.gg"
 Documentation = "https://supervisor.gg/docs/api"
-Repository = "https://github.com/phosphor-tech/supervisor-sdk-python"
+Repository = "https://github.com/Phosphor-gg/supervisor-sdk-python"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/supervisor"]
