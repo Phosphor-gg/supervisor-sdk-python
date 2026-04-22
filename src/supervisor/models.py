@@ -85,7 +85,7 @@ class UsernameCheckRequest(BaseModel):
     username: str
 
 
-class PartnerTokenRequest(BaseModel):
+class PlatformTokenRequest(BaseModel):
     """OAuth2 client credentials token exchange."""
 
     client_id: str
@@ -99,8 +99,8 @@ class ProvisionUserRequest(BaseModel):
     email: str
 
 
-class PartnerModerationRequest(BaseModel):
-    """Moderate content on behalf of a partner user."""
+class PlatformModerationRequest(BaseModel):
+    """Moderate content on behalf of a platform user."""
 
     user_email: str
     text: Optional[str] = None
@@ -110,8 +110,8 @@ class PartnerModerationRequest(BaseModel):
     include_context: bool = False
 
 
-class PartnerCheckoutRequest(BaseModel):
-    """Create a checkout session for a partner user."""
+class PlatformCheckoutRequest(BaseModel):
+    """Create a checkout session for a platform user."""
 
     user_email: str
     tier: Tier
@@ -148,7 +148,7 @@ class UsernameCheckResponse(BaseModel):
     score: float
 
 
-class PartnerTokenResponse(BaseModel):
+class PlatformTokenResponse(BaseModel):
     """OAuth2 access token response."""
 
     access_token: str
@@ -165,8 +165,8 @@ class ProvisionUserResponse(BaseModel):
     is_newly_linked: bool
 
 
-class PartnerUserInfo(BaseModel):
-    """Partner's view of a linked user."""
+class PlatformUserInfo(BaseModel):
+    """Platform's view of a linked user."""
 
     user_id: str
     email: str
@@ -176,7 +176,7 @@ class PartnerUserInfo(BaseModel):
     tier: Tier
 
 
-class PartnerCheckoutResponse(BaseModel):
+class PlatformCheckoutResponse(BaseModel):
     """Checkout session URL."""
 
     checkout_url: str

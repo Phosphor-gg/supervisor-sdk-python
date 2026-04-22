@@ -1,4 +1,4 @@
-"""Supervisor Partner API client with OAuth2 client credentials flow."""
+"""Supervisor Platform API client with OAuth2 client credentials flow."""
 
 from __future__ import annotations
 
@@ -15,12 +15,12 @@ from .models import (
     ModerationLabel,
     ModerationModel,
     ModerationResponse,
-    PartnerCheckoutRequest,
-    PartnerCheckoutResponse,
-    PartnerModerationRequest,
-    PartnerTokenRequest,
-    PartnerTokenResponse,
-    PartnerUserInfo,
+    PlatformCheckoutRequest,
+    PlatformCheckoutResponse,
+    PlatformModerationRequest,
+    PlatformTokenRequest,
+    PlatformTokenResponse,
+    PlatformUserInfo,
     ProvisionUserRequest,
     ProvisionUserResponse,
     StripeConnectStatusResponse,
@@ -29,13 +29,13 @@ from .models import (
 )
 
 
-class PartnerClient:
-    """Async client for the Supervisor Partner API.
+class PlatformClient:
+    """Async client for the Supervisor Platform API.
 
     Handles OAuth2 client credentials token exchange and automatic refresh.
 
     Usage:
-        async with PartnerClient(client_id="...", client_secret="...") as client:
+        async with PlatformClient(client_id="...", client_secret="...") as client:
             user = await client.provision_user("user@example.com")
     """
 
@@ -74,17 +74,17 @@ class PartnerClient:
         if self._access_token and time.time() < self._token_expires_at - 30:
             return self._access_token
 
-        request = PartnerTokenRequest(
+        request = PlatformTokenRequest(
             client_id=self._client_id,
             client_secret=self._client_secret,
         )
         response = await self._client.post(
-            "/api/partner/token", json=request.model_dump()
+            "/api/platform/token", json=request.model_dump()
         )
         if response.status_code >= 400:
             self._raise_error(response)
 
-        token_response = PartnerTokenResponse.model_validate(response.json())
+        token_response = PlatformTokenResponse.model_validate(response.json())
         self._access_token = token_response.access_token
         self._token_expires_at = time.time() + token_response.expires_in
         return self._access_token
@@ -128,30 +128,30 @@ class PartnerClient:
         """
         request = ProvisionUserRequest(email=email)
         response = await self._request(
-            "POST", "/api/partner/users/provision", json=request.model_dump()
+            "POST", "/api/platform/users/provision", json=request.model_dump()
         )
         return ProvisionUserResponse.model_validate(response.json())
 
-    async def list_users(self) -> list[PartnerUserInfo]:
-        """List all users linked to this partner.
+    async def list_users(self) -> list[PlatformUserInfo]:
+        """List all users linked to this platform.
 
         Returns:
-            List of PartnerUserInfo with subscription details.
+            List of PlatformUserInfo with subscription details.
         """
-        response = await self._request("GET", "/api/partner/users")
-        return [PartnerUserInfo.model_validate(u) for u in response.json()]
+        response = await self._request("GET", "/api/platform/users")
+        return [PlatformUserInfo.model_validate(u) for u in response.json()]
 
-    async def get_user(self, user_id: str) -> PartnerUserInfo:
+    async def get_user(self, user_id: str) -> PlatformUserInfo:
         """Get a specific linked user by ID.
 
         Args:
             user_id: The user's ID.
 
         Returns:
-            PartnerUserInfo for the specified user.
+            PlatformUserInfo for the specified user.
         """
-        response = await self._request("GET", f"/api/partner/users/{user_id}")
-        return PartnerUserInfo.model_validate(response.json())
+        response = await self._request("GET", f"/api/platform/users/{user_id}")
+        return PlatformUserInfo.model_validate(response.json())
 
     async def moderate(
         self,
@@ -176,7 +176,7 @@ class PartnerClient:
         Returns:
             ModerationResponse with flagged status and detected labels.
         """
-        request = PartnerModerationRequest(
+        request = PlatformModerationRequest(
             user_email=user_email,
             text=text,
             image=image,
@@ -185,7 +185,7 @@ class PartnerClient:
             include_context=include_context,
         )
         response = await self._request(
-            "POST", "/api/partner/moderate", json=request.model_dump(exclude_none=True)
+            "POST", "/api/platform/moderate", json=request.model_dump(exclude_none=True)
         )
         return ModerationResponse.model_validate(response.json())
 
@@ -196,8 +196,8 @@ class PartnerClient:
         billing_cycle: BillingCycle,
         success_url: str,
         cancel_url: str,
-    ) -> PartnerCheckoutResponse:
-        """Create a Stripe checkout session for a partner user.
+    ) -> PlatformCheckoutResponse:
+        """Create a Stripe checkout session for a platform user.
 
         Args:
             user_email: Email of the user to create checkout for.
@@ -207,9 +207,9 @@ class PartnerClient:
             cancel_url: URL to redirect on cancel.
 
         Returns:
-            PartnerCheckoutResponse with the checkout URL.
+            PlatformCheckoutResponse with the checkout URL.
         """
-        request = PartnerCheckoutRequest(
+        request = PlatformCheckoutRequest(
             user_email=user_email,
             tier=tier,
             billing_cycle=billing_cycle,
@@ -217,9 +217,9 @@ class PartnerClient:
             cancel_url=cancel_url,
         )
         response = await self._request(
-            "POST", "/api/partner/checkout", json=request.model_dump()
+            "POST", "/api/platform/checkout", json=request.model_dump()
         )
-        return PartnerCheckoutResponse.model_validate(response.json())
+        return PlatformCheckoutResponse.model_validate(response.json())
 
     async def confirm_authorization(self, code: str) -> ConfirmAuthorizationResponse:
         """Confirm a user's authorization with the provided code.
@@ -232,7 +232,7 @@ class PartnerClient:
         """
         request = ConfirmAuthorizationRequest(code=code)
         response = await self._request(
-            "POST", "/api/partner/users/confirm-authorization", json=request.model_dump()
+            "POST", "/api/platform/users/confirm-authorization", json=request.model_dump()
         )
         return ConfirmAuthorizationResponse.model_validate(response.json())
 
@@ -242,5 +242,5 @@ class PartnerClient:
         Returns:
             StripeConnectStatusResponse with account and charge status.
         """
-        response = await self._request("GET", "/api/partner/connect/status")
+        response = await self._request("GET", "/api/platform/connect/status")
         return StripeConnectStatusResponse.model_validate(response.json())

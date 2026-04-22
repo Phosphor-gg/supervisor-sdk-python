@@ -53,22 +53,22 @@ with SyncSupervisorClient(api_key="sk-...") as client:
     print(f"Flagged: {result.flagged}")
 ```
 
-## Partner API
+## Platform API
 
 For platform integrations using OAuth2 client credentials:
 
 ```python
-from supervisor import PartnerClient, Tier, BillingCycle
+from supervisor import PlatformClient, Tier, BillingCycle
 
-async with PartnerClient(client_id="...", client_secret="...") as partner:
+async with PlatformClient(client_id="...", client_secret="...") as platform:
     # Provision a user
-    user = await partner.provision_user("user@example.com")
+    user = await platform.provision_user("user@example.com")
 
     # Moderate on behalf of a user
-    result = await partner.moderate("user@example.com", text="check this")
+    result = await platform.moderate("user@example.com", text="check this")
 
     # Create a checkout session
-    checkout = await partner.create_checkout(
+    checkout = await platform.create_checkout(
         user_email="user@example.com",
         tier=Tier.STANDARD,
         billing_cycle=BillingCycle.MONTHLY,
@@ -78,7 +78,7 @@ async with PartnerClient(client_id="...", client_secret="...") as partner:
     print(f"Checkout URL: {checkout.checkout_url}")
 
     # List linked users
-    users = await partner.list_users()
+    users = await platform.list_users()
 ```
 
 ## Configuration

@@ -11,12 +11,12 @@ from .models import (
     ModerationModel,
     ModerationRequest,
     ModerationResponse,
-    PartnerCheckoutRequest,
-    PartnerCheckoutResponse,
-    PartnerModerationRequest,
-    PartnerTokenRequest,
-    PartnerTokenResponse,
-    PartnerUserInfo,
+    PlatformCheckoutRequest,
+    PlatformCheckoutResponse,
+    PlatformModerationRequest,
+    PlatformTokenRequest,
+    PlatformTokenResponse,
+    PlatformUserInfo,
     ProvisionUserRequest,
     ProvisionUserResponse,
     StripeConnectStatusResponse,
@@ -24,13 +24,13 @@ from .models import (
     UsernameCheckRequest,
     UsernameCheckResponse,
 )
-from .partner import PartnerClient
+from .platform import PlatformClient
 
 __all__ = [
     # Clients
     "SupervisorClient",
     "SyncSupervisorClient",
-    "PartnerClient",
+    "PlatformClient",
     # Errors
     "SupervisorError",
     "AuthenticationError",
@@ -45,18 +45,18 @@ __all__ = [
     "ModerationRequest",
     "BatchModerationRequest",
     "UsernameCheckRequest",
-    "PartnerTokenRequest",
+    "PlatformTokenRequest",
     "ProvisionUserRequest",
-    "PartnerModerationRequest",
-    "PartnerCheckoutRequest",
+    "PlatformModerationRequest",
+    "PlatformCheckoutRequest",
     "ConfirmAuthorizationRequest",
     # Response models
     "ModerationResponse",
     "UsernameCheckResponse",
-    "PartnerTokenResponse",
+    "PlatformTokenResponse",
     "ProvisionUserResponse",
-    "PartnerUserInfo",
-    "PartnerCheckoutResponse",
+    "PlatformUserInfo",
+    "PlatformCheckoutResponse",
     "ConfirmAuthorizationResponse",
     "StripeConnectStatusResponse",
 ]
