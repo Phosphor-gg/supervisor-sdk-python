@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import time
 from typing import Optional
 
@@ -53,6 +54,7 @@ class PlatformClient:
         self._timeout = timeout
         self._access_token: Optional[str] = None
         self._token_expires_at: float = 0
+        self._token_lock = asyncio.Lock()
         self._client = httpx.AsyncClient(
             base_url=self._base_url,
             headers={"Content-Type": "application/json"},
@@ -70,24 +72,35 @@ class PlatformClient:
         await self._client.aclose()
 
     async def _ensure_token(self) -> str:
-        """Get a valid access token, refreshing if expired."""
+        """Get a valid access token, refreshing if expired.
+
+        Guarded by a lock so concurrent callers don't fire duplicate token
+        exchanges; the expiry is re-checked inside the lock (double-checked) so
+        only the first waiter performs the refresh.
+        """
+        # Fast path: valid cached token, no lock needed.
         if self._access_token and time.time() < self._token_expires_at - 30:
             return self._access_token
 
-        request = PlatformTokenRequest(
-            client_id=self._client_id,
-            client_secret=self._client_secret,
-        )
-        response = await self._client.post(
-            "/api/platform/token", json=request.model_dump()
-        )
-        if response.status_code >= 400:
-            self._raise_error(response)
+        async with self._token_lock:
+            # Re-check: another coroutine may have refreshed while we waited.
+            if self._access_token and time.time() < self._token_expires_at - 30:
+                return self._access_token
 
-        token_response = PlatformTokenResponse.model_validate(response.json())
-        self._access_token = token_response.access_token
-        self._token_expires_at = time.time() + token_response.expires_in
-        return self._access_token
+            request = PlatformTokenRequest(
+                client_id=self._client_id,
+                client_secret=self._client_secret,
+            )
+            response = await self._client.post(
+                "/api/platform/token", json=request.model_dump()
+            )
+            if response.status_code >= 400:
+                self._raise_error(response)
+
+            token_response = PlatformTokenResponse.model_validate(response.json())
+            self._access_token = token_response.access_token
+            self._token_expires_at = time.time() + token_response.expires_in
+            return self._access_token
 
     async def _request(self, method: str, path: str, **kwargs) -> httpx.Response:
         token = await self._ensure_token()

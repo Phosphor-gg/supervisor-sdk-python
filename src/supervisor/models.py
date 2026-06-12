@@ -67,6 +67,7 @@ class ModerationRequest(BaseModel):
     model: Optional[ModerationModel] = None
     enabled_labels: Optional[list[ModerationLabel]] = None
     include_context: bool = False
+    include_implicit: bool = False
 
 
 class BatchModerationRequest(BaseModel):
@@ -77,6 +78,7 @@ class BatchModerationRequest(BaseModel):
     model: Optional[ModerationModel] = None
     enabled_labels: Optional[list[ModerationLabel]] = None
     include_context: bool = False
+    include_implicit: bool = False
 
 
 class UsernameCheckRequest(BaseModel):
@@ -108,6 +110,7 @@ class PlatformModerationRequest(BaseModel):
     model: Optional[ModerationModel] = None
     enabled_labels: Optional[list[ModerationLabel]] = None
     include_context: bool = False
+    include_implicit: bool = False
 
 
 class PlatformCheckoutRequest(BaseModel):
