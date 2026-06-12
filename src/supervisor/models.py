@@ -27,7 +27,6 @@ class ModerationLabel(StrEnum):
     PROMOTIONAL = "promotional"
     SCAM = "scam"
     ILLEGAL = "illegal"
-    PERSONAL_DATA = "personal-data"
 
 
 class ModerationModel(StrEnum):
@@ -131,14 +130,19 @@ class ConfirmAuthorizationRequest(BaseModel):
 
 
 class ModerationResponse(BaseModel):
-    """Result of a moderation request."""
+    """Result of a moderation request.
+
+    Label fields are plain strings (not the ModerationLabel enum) so new or
+    aliased labels returned by the server pass through instead of raising a
+    validation error.
+    """
 
     flagged: bool
-    labels: list[ModerationLabel]
-    implicit_labels: Optional[list[ModerationLabel]] = None
+    labels: list[str]
+    implicit_labels: Optional[list[str]] = None
     model_version: Optional[str] = None
     needs_context: Optional[bool] = None
-    context_labels: Optional[list[ModerationLabel]] = None
+    context_labels: Optional[list[str]] = None
     rewritten_text: Optional[str] = None
 
 
