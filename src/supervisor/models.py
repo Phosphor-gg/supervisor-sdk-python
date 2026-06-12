@@ -71,9 +71,10 @@ class ModerationRequest(BaseModel):
 
 
 class BatchModerationRequest(BaseModel):
-    """Request to moderate multiple texts at once."""
+    """Request to moderate multiple texts and/or images at once."""
 
     texts: list[str]
+    images: Optional[list[str]] = None
     model: Optional[ModerationModel] = None
     enabled_labels: Optional[list[ModerationLabel]] = None
     include_context: bool = False

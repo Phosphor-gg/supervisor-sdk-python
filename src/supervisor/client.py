@@ -118,23 +118,32 @@ class SupervisorClient:
         self,
         texts: list[str],
         *,
+        images: Optional[list[str]] = None,
         model: Optional[ModerationModel] = None,
         enabled_labels: Optional[list[ModerationLabel]] = None,
         include_context: bool = False,
     ) -> list[ModerationResponse]:
-        """Moderate multiple texts in a single request.
+        """Moderate multiple texts and/or images in a single request.
 
         Args:
             texts: List of text strings to moderate.
+            images: List of base64-encoded images to moderate. If both texts
+                and images are non-empty, their lengths must match.
             model: AI model to use.
             enabled_labels: Specific labels to check for.
             include_context: Whether to include conversation context.
 
         Returns:
-            List of ModerationResponse, one per input text.
+            List of ModerationResponse, one per input item.
         """
+        if texts and images and len(texts) != len(images):
+            raise ValueError(
+                "texts and images must have equal length when both are provided "
+                f"(got {len(texts)} texts and {len(images)} images)."
+            )
         request = BatchModerationRequest(
             texts=texts,
+            images=images,
             model=model,
             enabled_labels=enabled_labels,
             include_context=include_context,
@@ -159,14 +168,14 @@ class SupervisorClient:
         )
         return UsernameCheckResponse.model_validate(response.json())
 
-    async def get_labels(self) -> list[ModerationLabel]:
+    async def get_labels(self) -> dict[str, str]:
         """Get all available moderation labels.
 
         Returns:
-            List of all ModerationLabel values supported by the API.
+            Mapping of label name to its description.
         """
         response = await self._request("GET", "/api/labels")
-        return [ModerationLabel(label) for label in response.json()]
+        return response.json()
 
 
 class SyncSupervisorClient:
@@ -256,13 +265,23 @@ class SyncSupervisorClient:
         self,
         texts: list[str],
         *,
+        images: Optional[list[str]] = None,
         model: Optional[ModerationModel] = None,
         enabled_labels: Optional[list[ModerationLabel]] = None,
         include_context: bool = False,
     ) -> list[ModerationResponse]:
-        """Moderate multiple texts in a single request."""
+        """Moderate multiple texts and/or images in a single request.
+
+        If both texts and images are non-empty, their lengths must match.
+        """
+        if texts and images and len(texts) != len(images):
+            raise ValueError(
+                "texts and images must have equal length when both are provided "
+                f"(got {len(texts)} texts and {len(images)} images)."
+            )
         request = BatchModerationRequest(
             texts=texts,
+            images=images,
             model=model,
             enabled_labels=enabled_labels,
             include_context=include_context,
@@ -278,7 +297,11 @@ class SyncSupervisorClient:
         response = self._request("POST", "/api/username", json=request.model_dump())
         return UsernameCheckResponse.model_validate(response.json())
 
-    def get_labels(self) -> list[ModerationLabel]:
-        """Get all available moderation labels."""
+    def get_labels(self) -> dict[str, str]:
+        """Get all available moderation labels.
+
+        Returns:
+            Mapping of label name to its description.
+        """
         response = self._request("GET", "/api/labels")
-        return [ModerationLabel(label) for label in response.json()]
+        return response.json()
