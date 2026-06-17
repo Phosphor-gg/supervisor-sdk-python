@@ -41,10 +41,10 @@ class ModerationModel(StrEnum):
 class Tier(StrEnum):
     """Subscription tiers."""
 
-    FREE = "Free"
-    BASIC = "Basic"
-    STANDARD = "Standard"
-    PREMIUM = "Premium"
+    FREE = "free"
+    BASIC = "basic"
+    STANDARD = "standard"
+    PREMIUM = "premium"
 
 
 class BillingCycle(StrEnum):
