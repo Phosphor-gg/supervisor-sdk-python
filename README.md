@@ -105,6 +105,37 @@ async with PlatformClient(client_id="...", client_secret="...") as platform:
 
 `create_checkout` returns 403 if the user has not authorized the platform, and 400 if the user already has an active subscription (use `change_plan` instead). `change_plan` returns 403 if the subscription was not originated by this platform, and 400 if there is no active subscription. Revenue share is set at subscription creation and preserved across plan changes.
 
+### Products and checkout links
+
+Platforms sell Supervisor plans and credit packs from their own site. List the products, render them however you like, and when a user clicks, mint a per-user checkout link and redirect. Revenue share applies to both product types.
+
+```python
+products = await platform.get_products()
+# products.plans: subscription tiers with prices in cents
+# products.credit_packs: one-time credit packs
+
+# Plan checkout (new subscription)
+checkout = await platform.create_checkout(...)
+
+# Credit pack checkout (one-time payment)
+credits = await platform.create_credit_checkout(
+    user_email="user@example.com",
+    price_id=products.credit_packs[0].price_id,
+    success_url="https://myapp.com/thanks",
+    cancel_url="https://myapp.com/pricing",
+)
+# redirect the user to credits.checkout_url
+```
+
+Show an authorized user their remaining credits:
+
+```python
+balance = await platform.get_user_credits(user_id)
+# balance.balance is the total usable right now; monthly and extra breakdowns included
+```
+
+Returns 403 if the user has not authorized your platform.
+
 ## Configuration
 
 ```python

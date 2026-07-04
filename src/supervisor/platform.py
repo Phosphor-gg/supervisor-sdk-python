@@ -29,6 +29,9 @@ from .models import (
     StripeConnectStatusResponse,
     BillingCycle,
     Tier,
+    PlatformProductsResponse,
+    PlatformCreditCheckoutRequest,
+    PlatformUserCreditsResponse,
 )
 
 
@@ -261,6 +264,41 @@ class PlatformClient:
             "POST", "/api/platform/change-plan", json=request.model_dump()
         )
         return PlatformChangePlanResponse.model_validate(response.json())
+
+    async def get_products(self) -> PlatformProductsResponse:
+        """List the plans and credit packs this platform can sell."""
+        response = await self._request("GET", "/api/platform/products")
+        return PlatformProductsResponse.model_validate(response.json())
+
+    async def create_credit_checkout(
+        self,
+        user_email: str,
+        price_id: str,
+        success_url: str,
+        cancel_url: str,
+    ) -> PlatformCheckoutResponse:
+        """Create a Stripe checkout for a credit pack purchase.
+
+        Revenue share applies to the payment. The price_id must be a credit
+        pack from get_products().
+        """
+        request = PlatformCreditCheckoutRequest(
+            user_email=user_email,
+            price_id=price_id,
+            success_url=success_url,
+            cancel_url=cancel_url,
+        )
+        response = await self._request(
+            "POST", "/api/platform/checkout-credits", json=request.model_dump()
+        )
+        return PlatformCheckoutResponse.model_validate(response.json())
+
+    async def get_user_credits(self, user_id: str) -> PlatformUserCreditsResponse:
+        """Remaining credits of an authorized linked user."""
+        response = await self._request(
+            "GET", f"/api/platform/users/{user_id}/credits"
+        )
+        return PlatformUserCreditsResponse.model_validate(response.json())
 
     async def confirm_authorization(self, code: str) -> ConfirmAuthorizationResponse:
         """Confirm a user's authorization with the provided code.

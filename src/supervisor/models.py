@@ -206,6 +206,63 @@ class PlatformChangePlanResponse(BaseModel):
     billing_cycle: BillingCycle
 
 
+class PlanPrice(BaseModel):
+    """A subscription plan price a platform can sell. Amount is in cents.
+
+    payment_link is always None on the platform products endpoint: mint links
+    via create_checkout so the revenue share applies.
+    """
+
+    price_id: str
+    product_id: str
+    tier: Tier
+    billing_cycle: BillingCycle
+    amount: int
+    currency: str
+    payment_link: Optional[str] = None
+
+
+class CreditPack(BaseModel):
+    """A one-time credit pack a platform can sell."""
+
+    id: str
+    price_id: str
+    name: str
+    description: Optional[str] = None
+    price_cents: int
+    currency: str
+    credits_amount: int
+
+
+class PlatformProductsResponse(BaseModel):
+    """Everything a platform can sell: plans and credit packs."""
+
+    plans: list[PlanPrice]
+    credit_packs: list[CreditPack]
+
+
+class PlatformCreditCheckoutRequest(BaseModel):
+    """Credit pack checkout for a linked user."""
+
+    user_email: str
+    price_id: str
+    success_url: str
+    cancel_url: str
+
+
+class PlatformUserCreditsResponse(BaseModel):
+    """Remaining credits of an authorized linked user."""
+
+    user_id: str
+    email: str
+    balance: int
+    monthly_allocation: int
+    used_this_month: int
+    remaining_this_month: int
+    extra_credits: int
+    reset_date: Optional[str] = None
+
+
 class ConfirmAuthorizationResponse(BaseModel):
     """Confirmed authorization result."""
 
