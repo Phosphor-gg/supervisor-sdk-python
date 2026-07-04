@@ -123,6 +123,14 @@ class PlatformCheckoutRequest(BaseModel):
     cancel_url: str
 
 
+class PlatformChangePlanRequest(BaseModel):
+    """Change the plan of a platform user's active subscription."""
+
+    user_email: str
+    tier: Tier
+    billing_cycle: BillingCycle
+
+
 class ConfirmAuthorizationRequest(BaseModel):
     """Confirm user authorization with a code."""
 
@@ -188,6 +196,14 @@ class PlatformCheckoutResponse(BaseModel):
     """Checkout session URL."""
 
     checkout_url: str
+
+
+class PlatformChangePlanResponse(BaseModel):
+    """Result of a plan change."""
+
+    subscription_id: str
+    tier: Tier
+    billing_cycle: BillingCycle
 
 
 class ConfirmAuthorizationResponse(BaseModel):

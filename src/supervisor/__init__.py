@@ -11,6 +11,8 @@ from .models import (
     ModerationModel,
     ModerationRequest,
     ModerationResponse,
+    PlatformChangePlanRequest,
+    PlatformChangePlanResponse,
     PlatformCheckoutRequest,
     PlatformCheckoutResponse,
     PlatformModerationRequest,
@@ -49,6 +51,7 @@ __all__ = [
     "ProvisionUserRequest",
     "PlatformModerationRequest",
     "PlatformCheckoutRequest",
+    "PlatformChangePlanRequest",
     "ConfirmAuthorizationRequest",
     # Response models
     "ModerationResponse",
@@ -57,6 +60,7 @@ __all__ = [
     "ProvisionUserResponse",
     "PlatformUserInfo",
     "PlatformCheckoutResponse",
+    "PlatformChangePlanResponse",
     "ConfirmAuthorizationResponse",
     "StripeConnectStatusResponse",
 ]

@@ -16,6 +16,8 @@ from .models import (
     ModerationLabel,
     ModerationModel,
     ModerationResponse,
+    PlatformChangePlanRequest,
+    PlatformChangePlanResponse,
     PlatformCheckoutRequest,
     PlatformCheckoutResponse,
     PlatformModerationRequest,
@@ -233,6 +235,32 @@ class PlatformClient:
             "POST", "/api/platform/checkout", json=request.model_dump()
         )
         return PlatformCheckoutResponse.model_validate(response.json())
+
+    async def change_plan(
+        self,
+        user_email: str,
+        tier: Tier,
+        billing_cycle: BillingCycle,
+    ) -> PlatformChangePlanResponse:
+        """Change the plan of a platform user's active subscription.
+
+        Args:
+            user_email: Email of the user whose subscription to change.
+            tier: New subscription tier.
+            billing_cycle: New billing period.
+
+        Returns:
+            PlatformChangePlanResponse with the updated subscription details.
+        """
+        request = PlatformChangePlanRequest(
+            user_email=user_email,
+            tier=tier,
+            billing_cycle=billing_cycle,
+        )
+        response = await self._request(
+            "POST", "/api/platform/change-plan", json=request.model_dump()
+        )
+        return PlatformChangePlanResponse.model_validate(response.json())
 
     async def confirm_authorization(self, code: str) -> ConfirmAuthorizationResponse:
         """Confirm a user's authorization with the provided code.

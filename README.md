@@ -79,15 +79,39 @@ async with PlatformClient(client_id="...", client_secret="...") as platform:
 
     # List linked users
     users = await platform.list_users()
+
+    # Get a specific linked user by ID
+    info = await platform.get_user(user.user_id)
+    print(f"Authorized: {info.authorized}, Tier: {info.tier}")
+
+    # Confirm a user's authorization with the code from the consent flow
+    confirmed = await platform.confirm_authorization("auth-code-from-redirect")
+    print(f"Authorized user: {confirmed.email}")
+
+    # Check Stripe Connect onboarding status
+    status = await platform.get_connect_status()
+    print(f"Onboarding complete: {status.onboarding_complete}")
+
+    # Change the plan of an existing subscription
+    change = await platform.change_plan(
+        user_email="user@example.com",
+        tier=Tier.PREMIUM,
+        billing_cycle=BillingCycle.ANNUAL,
+    )
+    print(f"Subscription {change.subscription_id} is now {change.tier}")
 ```
+
+### Checkout and plan changes
+
+`create_checkout` returns 403 if the user has not authorized the platform, and 400 if the user already has an active subscription (use `change_plan` instead). `change_plan` returns 403 if the subscription was not originated by this platform, and 400 if there is no active subscription. Revenue share is set at subscription creation and preserved across plan changes.
 
 ## Configuration
 
 ```python
 client = SupervisorClient(
     api_key="sk-...",
-    base_url="https://api.supervisor.gg",  # default
-    timeout=30.0,                           # seconds, default
+    base_url="https://supervisor.gg",  # default
+    timeout=30.0,                      # seconds, default
 )
 ```
 
@@ -101,7 +125,7 @@ client = SupervisorClient(
 | `hate` | Hate/Racism |
 | `insult` | Insult |
 | `sexual` | Sexual |
-| `sexual/minors` | Sexual (Minors) |
+| `sexual/unlawful` | Sexual (Unlawful) |
 | `sexual/explicit` | Sexual (Explicit) |
 | `sensitive` | Sensitive Content |
 | `violence` | Violence |
@@ -111,7 +135,6 @@ client = SupervisorClient(
 | `promotional` | Promotional |
 | `scam` | Scam/Incoherent |
 | `illegal` | Illegal Activity |
-| `personal-data` | Personal Data |
 
 ## Models
 

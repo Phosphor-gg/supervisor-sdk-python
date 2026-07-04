@@ -17,7 +17,7 @@ from .models import (
     UsernameCheckResponse,
 )
 
-DEFAULT_BASE_URL = "https://api.supervisor.gg"
+DEFAULT_BASE_URL = "https://supervisor.gg"
 
 
 class SupervisorClient:
