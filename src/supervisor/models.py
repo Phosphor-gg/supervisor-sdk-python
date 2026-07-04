@@ -45,6 +45,7 @@ class Tier(StrEnum):
     BASIC = "basic"
     STANDARD = "standard"
     PREMIUM = "premium"
+    VERIFIED = "verified"
 
 
 class BillingCycle(StrEnum):
@@ -234,11 +235,23 @@ class CreditPack(BaseModel):
     credits_amount: int
 
 
+class LifetimePlan(BaseModel):
+    """The lifetime (Verified) plan: one-time purchase, no billing cycle."""
+
+    product_id: str
+    price_id: str
+    name: str
+    amount: int
+    currency: str
+    monthly_credits: int
+
+
 class PlatformProductsResponse(BaseModel):
-    """Everything a platform can sell: plans and credit packs."""
+    """Everything a platform can sell: plans, credit packs, lifetime plan."""
 
     plans: list[PlanPrice]
     credit_packs: list[CreditPack]
+    lifetime: Optional[LifetimePlan] = None
 
 
 class PlatformCreditCheckoutRequest(BaseModel):
