@@ -2,6 +2,7 @@
 
 from .client import SupervisorClient, SyncSupervisorClient
 from .errors import AuthenticationError, RateLimitError, SupervisorError, ValidationError
+from .image_prep import prepare_image
 from .models import (
     BatchModerationRequest,
     BillingCycle,
@@ -39,6 +40,8 @@ __all__ = [
     "SupervisorClient",
     "SyncSupervisorClient",
     "PlatformClient",
+    # Utilities
+    "prepare_image",
     # Errors
     "SupervisorError",
     "AuthenticationError",

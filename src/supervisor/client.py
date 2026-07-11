@@ -7,6 +7,7 @@ from typing import Optional
 import httpx
 
 from .errors import AuthenticationError, RateLimitError, SupervisorError, ValidationError
+from .image_prep import prepare_image
 from .models import (
     BatchModerationRequest,
     ModerationLabel,
@@ -18,6 +19,13 @@ from .models import (
 )
 
 DEFAULT_BASE_URL = "https://supervisor.gg"
+
+
+def _prepare_images(images: Optional[list[str]]) -> Optional[list[str]]:
+    """Preprocess a batch of base64 images, leaving empty entries unchanged."""
+    if images is None:
+        return None
+    return [prepare_image(img) if img else img for img in images]
 
 
 class SupervisorClient:
@@ -104,7 +112,7 @@ class SupervisorClient:
         """
         request = ModerationRequest(
             text=text,
-            image=image,
+            image=prepare_image(image) if image else image,
             model=model,
             enabled_labels=enabled_labels,
             include_context=include_context,
@@ -143,7 +151,7 @@ class SupervisorClient:
             )
         request = BatchModerationRequest(
             texts=texts,
-            images=images,
+            images=_prepare_images(images),
             model=model,
             enabled_labels=enabled_labels,
             include_context=include_context,
@@ -251,7 +259,7 @@ class SyncSupervisorClient:
         """Moderate text or an image for harmful content."""
         request = ModerationRequest(
             text=text,
-            image=image,
+            image=prepare_image(image) if image else image,
             model=model,
             enabled_labels=enabled_labels,
             include_context=include_context,
@@ -281,7 +289,7 @@ class SyncSupervisorClient:
             )
         request = BatchModerationRequest(
             texts=texts,
-            images=images,
+            images=_prepare_images(images),
             model=model,
             enabled_labels=enabled_labels,
             include_context=include_context,

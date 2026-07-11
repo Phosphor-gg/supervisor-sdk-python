@@ -10,6 +10,7 @@ import httpx
 
 from .client import DEFAULT_BASE_URL
 from .errors import AuthenticationError, RateLimitError, SupervisorError, ValidationError
+from .image_prep import prepare_image
 from .models import (
     ConfirmAuthorizationRequest,
     ConfirmAuthorizationResponse,
@@ -197,7 +198,7 @@ class PlatformClient:
         request = PlatformModerationRequest(
             user_email=user_email,
             text=text,
-            image=image,
+            image=prepare_image(image) if image else image,
             model=model,
             enabled_labels=enabled_labels,
             include_context=include_context,
